@@ -73,28 +73,61 @@ for i in range(N):
 
 #------------------------------------------------
 
-ma,mb = [1, 1]
-ka,kb = [50, 50]
+ma,mb = [1, 2]
+ka,kb = [10, 50]
 xeqa,xeqb = [3, 3]
 xoa,xob = [2, 8]
 voa,vob = [0, 0]
 rad = 0.25
-post2 = 12
 tf = 60 
-initialize = "increment"
+initialize_position = "stagger"
+initialize_mass = "random"
+initialize_equilibrium = "increment"
+initialize_spring_constant = "random"
+initialize_velocity = "increment"
 
 
+if initialize_equilibrium == "increment":
+	xeq = np.linspace(xeqa,xeqb,N+1) 
 
-if initialize == "increment":
-	m = np.linspace(ma,mb,N)
-	k = np.linspace(ka,kb,N+1)
-	xeq = np.linspace(xeqa,xeqb,N+1)
+post2 = sum(xeq)
+
+if initialize_position == "incrment":
 	xo = np.linspace(xoa,xob,N)
-	vo = np.linspace(voa,vob,N)
-	ic = []
-	for i in range(N):
-		ic.append(xo[i])
-		ic.append(vo[i])
+elif initialize_position == "stagger":
+	rng = np.random.default_rng(92738273)
+	xo = np.zeros(N)
+	xo[0] = rng.random() * (xeq[0]+xeq[1])
+	for i in range(1,N-1):
+		sum = 0
+		for j in range(i+1):
+			sum += xeq[j]
+		dx = rng.random() * (sum - xo[i-1] + xeq[i+1])
+		while dx > xeq[i]+xeq[i+1]:
+			dx *= rng.random()
+		xo[i] = xo[i-1] + dx
+	dx = rng.random() * (post2 - xo[N-2])
+	while dx > xeq[N-1]+xeq[N]:
+		dx *= rng.random()
+	xo[N-1] = xo[N-2] + dx
+
+if initialize_mass == "increment":
+	m = np.linspace(ma,mb,N)
+elif initialize_mass == "random":
+	m = (mb - ma) * np.random.rand(N) + ma
+
+if initialize_spring_constant == "increment":
+	k = np.linspace(ka,kb,N+1)
+elif initialize_spring_constant == "random":
+	k = (kb - ka) * np.random.rand(N+1) + ka
+
+if initialize_velocity == "increment":
+	vo = np.linspace(voa,vob,N) 
+
+ic = []
+for i in range(N):
+	ic.append(xo[i])
+	ic.append(vo[i])
 
 p = m,k,xeq,post2
 
