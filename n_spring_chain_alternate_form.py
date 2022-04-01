@@ -34,7 +34,7 @@ def integrate(ic, ti, p):
 	return diff_eq
 
 
-N = 3 
+N = 6 
 
 Xp, t = sp.symbols('Xp t')
 M = sp.symbols('M0:%i'%N)
@@ -75,8 +75,8 @@ for i in range(N):
 
 ma,mb = [1, 2]
 ka,kb = [10, 50]
-xeqa,xeqb = [3, 3]
-xoa,xob = [2, 8]
+xeqa,xeqb = [3, 5]
+xoa,xob = [0, 0] #not used if set to "stagger"
 voa,vob = [0, 0]
 rad = 0.25
 tf = 60 
@@ -89,6 +89,8 @@ initialize_velocity = "increment"
 
 if initialize_equilibrium == "increment":
 	xeq = np.linspace(xeqa,xeqb,N+1) 
+elif initialize_equilibrium == "random":
+	xeq = (xeqb - xeqa) * np.random.rand(N+1) + xeqa
 
 post2 = sum(xeq)
 
